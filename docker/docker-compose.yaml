@@ -1,0 +1,9 @@
+version: '2'
+services:
+  youtube_node:
+    build: ./
+    working_dir: /var/youtube-loader/
+    command: tail -f /dev/null
+    volumes:
+      - ../:/var/youtube-loader
+    tty: true
