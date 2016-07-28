@@ -42,8 +42,8 @@ function processSong(provider, id, pid, callback) {
 
     yield store(provider, song, siblings);
     colors.push(color);
-  }).then(callback)
-    .catch(callback);
+  })
+    .then(callback).catch(callback);
 }
 
 /**
@@ -66,8 +66,10 @@ co(function*() {
   const limit = parseInt(process.argv[3]) || 3;
   const ids = yield ws(provider, 1000, 3);
 
+  console.log(`${ids.length} songs will be looked up on ${provider}`);
+
   async.eachOfLimit(ids, limit, _.partial(processSong, provider), err => {
-    err && console.log(err);
+    /*err && */console.log(arguments);
     console.log('done');
   })
 

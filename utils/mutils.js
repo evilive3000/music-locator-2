@@ -1,13 +1,15 @@
 "use strict";
 
-const _ = require('lodash');
 const co = require('co');
 const mongodb = require("mongodb");
 const ObjectID = mongodb.ObjectID;
+let _db = null;
 
 function db(cfg) {
-  const url = `mongodb://${cfg.host}:${cfg.port}/${cfg.name}?${cfg.options || ""}`;
-  return mongodb.MongoClient.connect(url);
+  return co(function*() {
+    const url = `mongodb://${cfg.host}:${cfg.port}/${cfg.name}?${cfg.options || ""}`;
+    return _db ? _db : mongodb.MongoClient.connect(url).then(r => _db = r);
+  });
 }
 
 function collection(dbcfg, name) {
@@ -50,6 +52,10 @@ function repeater(fn, thisArg) {
   })
 }
 
+function closeDb() {
+  return _db ? _db.close() : null;
+}
+
 /**
  *
  * @param fn
@@ -60,5 +66,4 @@ const repeatrequest = (fn, thisArg) => function () {
   return repeater(fn, thisArg, ...arguments)
 };
 
-
-module.exports = {collection, date2ObjectID, DAY, repeatrequest};
+module.exports = {collection, date2ObjectID, DAY, repeatrequest, closeDb};
