@@ -9,6 +9,7 @@ const store = require('./utils/store')(config);
 const tidido = require('./providers/tidido');
 const async = require('async');
 const Chalk = require('chalk');
+const mutils = require('./utils/mutils');
 
 const colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan', /*'white', */'gray'/*, 'black'*/];
 
@@ -69,8 +70,9 @@ co(function*() {
   console.log(`${ids.length} songs will be looked up on ${provider}`);
 
   async.eachOfLimit(ids, limit, _.partial(processSong, provider), err => {
-    /*err && */console.log(arguments);
+    err && console.log(err);
     console.log('done');
+    mutils.closeDb();
   })
 
 }).catch(e => {
