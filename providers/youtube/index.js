@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
 const co = require('co');
 const tools = require('../tools');
 const _ = require('lodash');
+const repeater = require('../../utils/mutils').repeatrequest;
 
 /**
  *
@@ -57,20 +58,20 @@ const pages = ['EgIQAUgA6gMA', 'EgIQAUgU6gMA', 'EgIQAUgo6gMA', 'EgIQAUg86gMA'];
  * @param page
  * @returns {Promise}
  */
-function find(song, page) {
+const find = repeater(function (song, page) {
   page || (page = 0);
   return request
     .get("https://www.youtube.com/results")
     .query({search_query: `${song.artist} intitle:"${song.title}"`})
     .query({sp: pages[page % pages.length]})
     .then(parseresponse);
-}
+});
 
 function simpleScore(A, B) {
   const durDelta = Math.abs(A.duration - B.duration);
   let score = durDelta > 4 ? 0 : 1 - Math.min(1, Math.pow(durDelta, 2) / 100);
   // если в названии содержится слово "cover"
-  return score * (/\bcovre\b/i.test(B.title) ? 0.8 : 1.0);
+  return score * (/\bcover\b/i.test(B.title) ? 0.0 : 1.0);
 }
 
 function getCandidates(song, limit) {
@@ -84,9 +85,11 @@ function getCandidates(song, limit) {
       // yield dests.map(tools.filesize);
       dests = dests.concat(pagedests);
       // console.log(`page:${page}   length=${dests.length}`);
-    } while(dests.length < 4 && ++page < pages.length);
+    } while (dests.length < 4 && ++page < pages.length);
 
-    return tools.softFilter(song, dests, limit, simpleScore).map(fetchOne);
+    return yield tools
+      .softFilter(song, dests, limit, simpleScore)
+      .map(fetchOne);
   });
 }
 

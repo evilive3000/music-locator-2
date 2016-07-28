@@ -1,7 +1,6 @@
 "use strict";
 
 const _ = require('lodash');
-const co = require('co');
 const request = require('superagent');
 const fp = require('fpcalc');
 const fpOffset = require('../utils/fingerprint').findOffset;
@@ -48,16 +47,14 @@ function softFilter(song, dests, limit, scoreFn) {
  *
  * @param songs
  * @param len
- * @returns {*}
+ * @returns {Array.<Promise>}
  */
 function fetchFingerprints(songs, len) {
-  const promises = songs
+  return songs
   // отбираем только те которые еще не загружались и у которых есть url
     .filter(s => !s.fp)
     // загружаем фингерпринты
     .map((v, k) => fpcalc(songs[k], len));
-
-  return Promise.all(promises);
 }
 
 /**
@@ -65,7 +62,7 @@ function fetchFingerprints(songs, len) {
  * @param song
  * @param dests
  * @param mse
- * @returns {*}
+ * @returns {Array}
  */
 function hardFilter(song, dests, mse) {
   // сравниванием файлы
@@ -81,17 +78,18 @@ function hardFilter(song, dests, mse) {
  *
  * @param song
  * @param len
- * @returns {Promise<T>|Promise}
+ * @returns {Promise}
  */
 function fpcalc(song, len) {
   len || (len = 200);
 
   return new Promise(resolve => {
-    if (!song.url) return resolve(_.set(song, 'fp', []));
+    if (!song.url)
+      return resolve(_.set(song, 'fp', []));
 
     const callback = (err, fp) => {
       err && console.log('[error:fpcalc]', err);
-      song.fp = err ? [] : fp.fingerprint;
+      song.fp = err ? [] : fp.fingerprintRaw.split(',').map(_.toInteger);
       resolve(song);
     };
 

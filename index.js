@@ -43,10 +43,18 @@ function processChunk(provider, ids, callback) {
     .catch(callback);
 }
 
+function getProvider() {
+  const name = process.argv[2];
+  if (["youtube"].includes(name)) {
+    return name;
+  }
+  throw new Error(`Provider ${name} not defined.`);
+}
+
 co(function*() {
-  const provider = 'youtube';
-  const limit = parseInt(process.argv[2]) || 3;
-  const ids = yield ws(provider, 1000, 1);
+  const provider = getProvider();
+  const limit = parseInt(process.argv[3]) || 3;
+  const ids = yield ws(provider, 4000, 3);
   const chunks = _.chunk(ids, Math.ceil(ids.length / limit));
 
   async.each(chunks, _.partial(processChunk, provider), err => {
@@ -54,4 +62,7 @@ co(function*() {
     console.log('done');
   })
 
-}).catch(e => console.log(e));
+}).catch(e => {
+  console.log(e);
+  process.exit();
+});
