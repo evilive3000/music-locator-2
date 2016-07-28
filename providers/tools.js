@@ -88,7 +88,7 @@ function fpcalc(song, len) {
       return resolve(_.set(song, 'fp', []));
 
     const callback = (err, fp) => {
-      err && console.log('[error:fpcalc]', err);
+      err && console.log('[error:fpcalc]', err, song);
       song.fp = err ? [] : fp.fingerprintRaw.split(',').map(_.toInteger);
       resolve(song);
     };

@@ -15,9 +15,9 @@ const repeater = require('../../utils/mutils').repeatrequest;
  */
 function fetchOne(song) {
   return new Promise(resolve=> {
-    exec(`youtube-dl -j ${song.url}`, {timeout: 120000}, function (err, stdout, stderr) {
+    exec(`youtube-dl -j ${song.url}`, {timeout: 60000}, function (err, stdout, stderr) {
       if (stderr.length) {
-        console.log('[fetchOne:error]', stderr);
+        console.log('[fetchOne:error]', stderr, song);
         song.url = null;
       } else {
         const formats = stdout.length ? JSON.parse(stdout).formats : {};
@@ -67,6 +67,12 @@ const find = repeater(function (song, page) {
     .then(parseresponse);
 });
 
+/**
+ * 
+ * @param A
+ * @param B
+ * @returns {number}
+ */
 function simpleScore(A, B) {
   const durDelta = Math.abs(A.duration - B.duration);
   let score = durDelta > 4 ? 0 : 1 - Math.min(1, Math.pow(durDelta, 2) / 100);
@@ -74,6 +80,12 @@ function simpleScore(A, B) {
   return score * (/\bcover\b/i.test(B.title) ? 0.0 : 1.0);
 }
 
+/**
+ * 
+ * @param song
+ * @param limit
+ * @returns {Promise}
+ */
 function getCandidates(song, limit) {
   return co(function*() {
     let page = 0;
