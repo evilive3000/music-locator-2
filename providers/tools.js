@@ -88,9 +88,14 @@ function fpcalc(song, len) {
       return resolve(_.set(song, 'fp', []));
 
     const callback = (err, fp) => {
-      err && console.log('[error:fpcalc]', err, song);
-      song.fp = err ? [] : fp.fingerprintRaw.split(',').map(_.toInteger);
-      resolve(song);
+      if (err) {
+        console.log('[error:fpcalc]', err, song);
+        song.fp = [];
+        _.delay(()=>resolve(song), 30000)
+      } else {
+        song.fp = fp.fingerprintRaw.split(',').map(_.toInteger);
+        resolve(song);
+      }
     };
 
     // тут нужен типа таймаут, так как fpcalc

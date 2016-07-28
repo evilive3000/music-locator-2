@@ -53,19 +53,28 @@ function processSong(provider, id, pid, callback) {
  */
 function getProvider() {
   const name = process.argv[2];
-  if (["youtube"].includes(name)) {
+  if (["youtube", "zv"].includes(name)) {
     return name;
   }
   throw new Error(`Provider ${name} not defined.`);
 }
 
+
+const provider = getProvider();
+const limit = parseInt(process.argv[3]) || 3;
+const topN = parseInt(process.argv[4]) || 3000;
+const days = parseInt(process.argv[5]) || 3;
+
+console.log(`Provider: ${provider}`);
+console.log(`Threads: ${limit}`);
+console.log(`Top: ${topN}`);
+console.log(`Days: ${days}`);
+
 /**
  *
  */
 co(function*() {
-  const provider = getProvider();
-  const limit = parseInt(process.argv[3]) || 3;
-  const ids = yield ws(provider, 1000, 3);
+  const ids = yield ws(provider, topN, days);
 
   console.log(`${ids.length} songs will be looked up on ${provider}`);
 

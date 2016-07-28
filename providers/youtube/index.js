@@ -13,7 +13,7 @@ const repeater = require('../../utils/mutils').repeatrequest;
  * @param song
  * @returns {Promise}
  */
-function fetchOne(song) {
+const fetchOne = repeater(function fetchOne(song) {
   return new Promise(resolve=> {
     exec(`youtube-dl -j ${song.url}`, {timeout: 60000}, function (err, stdout, stderr) {
       if (stderr.length) {
@@ -30,7 +30,7 @@ function fetchOne(song) {
       resolve(song);
     })
   })
-}
+});
 
 /**
  *
