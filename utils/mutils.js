@@ -1,7 +1,8 @@
 "use strict";
 
-const co = require('co');
+const co = require("co");
 const mongodb = require("mongodb");
+const Chalk = require("chalk");
 const ObjectID = mongodb.ObjectID;
 let _db = null;
 
@@ -43,9 +44,10 @@ function repeater(fn, thisArg) {
         return yield fn.apply(thisArg, args)
       } catch (e) {
         if (e.status === 404) throw e.response.error;
+        if (e.message !== 'VK Error') console.log(e);
         success = false;
       }
-      console.log(`repeat in ${2 * delay} sec`);
+      console.log(Chalk.bgRed(`repeat in ${2 * delay} sec`));
       yield wait(delay *= 2);
     } while (!success && delay < 128);
     throw new Error("repeater timeout!");

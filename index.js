@@ -34,7 +34,15 @@ function processSong(provider, id, pid, callback) {
     const title = `${song.artist} - ${song.title}`;
 
     writeln(`siblings: ${title}`);
-    const siblings = yield getSiblings(provider, song, config);
+    let siblings = [];
+    try {
+      siblings = yield getSiblings(provider, song, config);
+    } catch (e) {
+      if (e.status === 404) {
+        console.log(e.message);
+        return;
+      }
+    }
 
     const mse = siblings.map(s => s.mse.val.toFixed(2));
     mse.length === 0
@@ -53,7 +61,7 @@ function processSong(provider, id, pid, callback) {
  */
 function getProvider() {
   const name = process.argv[2];
-  if (["youtube", "zv"].includes(name)) {
+  if (["youtube", "zv", "vk"].includes(name)) {
     return name;
   }
   throw new Error(`Provider ${name} not defined.`);

@@ -14,11 +14,13 @@ const repeater = require('../../utils/mutils').repeatrequest;
  * @returns {Promise}
  */
 const fetchOne = repeater(function fetchOne(song) {
-  return new Promise(resolve=> {
+  return new Promise((resolve, reject)=> {
     exec(`youtube-dl -j ${song.url}`, {timeout: 60000}, function (err, stdout, stderr) {
       if (stderr.length) {
-        console.log('[fetchOne:error]', stderr, song);
-        song.url = null;
+        console.log(`[fetchOne:error]' ${stderr}\n${song.title}`);
+        // song.url = null;
+        song.err = stderr;
+        reject(stderr)
       } else {
         const formats = stdout.length ? JSON.parse(stdout).formats : {};
         const o = _(formats)
@@ -26,8 +28,8 @@ const fetchOne = repeater(function fetchOne(song) {
           .sortBy('filesize')
           .first();
         song.url = o ? o.url : null;
+        resolve(song);
       }
-      resolve(song);
     })
   })
 });
@@ -64,11 +66,11 @@ const find = repeater(function (song, page) {
     .get("https://www.youtube.com/results")
     .query({search_query: `${song.artist} intitle:"${song.title}"`})
     .query({sp: pages[page % pages.length]})
-    .then(parseresponse);
+    .then(parseresponse, err => Promise.reject(err));
 });
 
 /**
- * 
+ *
  * @param A
  * @param B
  * @returns {number}
@@ -81,7 +83,7 @@ function simpleScore(A, B) {
 }
 
 /**
- * 
+ *
  * @param song
  * @param limit
  * @returns {Promise}
@@ -106,4 +108,3 @@ function getCandidates(song, limit) {
 }
 
 module.exports = {getCandidates};
-

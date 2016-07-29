@@ -16,7 +16,7 @@ const providers = {
       // т.е. получили массив айдишников в порядке похожести
       // на тидидовскую песню, чем выше в массиве тем похожее.
       .sortBy('mse.val')
-      .filter(v => v.mse.val < 1.0) // config.mse
+      .filter(v => v.mse.val < config.mse)
       .map(v => ({id: v._id, mse: v.mse.val}))
       .value();
     return items.length
@@ -27,7 +27,7 @@ const providers = {
   zv: function (data) {
     const items = _(data.meta)
       .sortBy('mse.val')
-      .filter(v => v.mse.val < 1.0) // config.mse
+      .filter(v => v.mse.val < config.mse)
       .map(v => ({id: v.id, mse: v.mse.val, url: v.url}))
       .value();
     return items.length

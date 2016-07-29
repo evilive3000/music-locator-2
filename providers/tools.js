@@ -89,7 +89,7 @@ function fpcalc(song, len) {
 
     const callback = (err, fp) => {
       if (err) {
-        console.log('[error:fpcalc]', err, song);
+        console.log(`[error:fpcalc] ${err.message}\n${song.title}`);
         song.fp = [];
         _.delay(()=>resolve(song), 30000)
       } else {
@@ -123,7 +123,7 @@ function filesize(song, options) {
   }
 
   return req.then(res => res, err => {
-    console.log('[error:filesize]', err);
+    console.log(`[error:filesize] ${err.message} ${song.url}`);
     song.size = null;
     song.bitrate = 0;
     song.err = err;

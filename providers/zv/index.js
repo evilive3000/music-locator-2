@@ -43,7 +43,7 @@ const find = repeater(function (song) {
     .query({keywords: search.replace(/[)!]/g, ' ')});
 
   headers.forEach(header => req.set.apply(req, header));
-  return req.then(parseresponse);
+  return req.then(parseresponse, err => Promise.reject(err));
 });
 
 /**
