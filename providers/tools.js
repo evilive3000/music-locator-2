@@ -126,11 +126,14 @@ function filesize(song, options) {
     console.log('[error:filesize]', err);
     song.size = null;
     song.bitrate = 0;
+    song.err = err;
     return Promise.resolve(song);
   }).then(res => {
-    song.size = _.toInteger(res.header['content-length']);
-    song.bitrate || (song.bitrate = _.toInteger(0.008 * song.size / song.duration));
-    if (res.redirects.length) {
+    if (!song.err && res.header){
+      song.size = _.toInteger(res.header['content-length']);
+      song.bitrate || (song.bitrate = _.toInteger(0.008 * song.size / song.duration));
+    }
+    if (_.get(res, 'redirects.length', null)) {
       song.url = _.last(res.redirects);
     }
     return song;
