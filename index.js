@@ -43,7 +43,7 @@ function processSong(provider, id, pid, callback) {
         return;
       }
     }
-
+    // каким то образом может быть так что val == undefined
     const mse = siblings.map(s => s.mse.val.toFixed(2));
     mse.length === 0
       ? writeln(`"${title}" ${cstr.bold("[no siblings]")}`)

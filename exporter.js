@@ -17,7 +17,7 @@ const providers = {
       // на тидидовскую песню, чем выше в массиве тем похожее.
       .sortBy('mse.val')
       .filter(v => v.mse.val < config.mse)
-      .map(v => ({id: v._id, mse: v.mse.val}))
+      .map(v => ({id: v._id, mse: v.mse.val * 1.25}))  // !!! завышаем значение ошибки, такой себе способ понизить приоритет
       .value();
     return items.length
       ? {update: data.update, items}
@@ -39,7 +39,7 @@ const providers = {
     const items = _(data.meta)
       .sortBy('mse.val')
       .filter(v => v.mse.val < config.mse)
-      .map(v => ({id: v.id, mse: v.mse.val}))
+      .map(v => ({id: v.id, mse: v.mse.val * 0.8})) // !!! занижаем значение ошибки, типа повышаем приоритет!!!
       .value();
 
     return items.length
