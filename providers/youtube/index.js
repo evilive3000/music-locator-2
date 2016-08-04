@@ -22,7 +22,14 @@ const fetchOne = repeater(function fetchOne(song) {
         song.err = stderr;
         reject(stderr)
       } else {
-        const formats = stdout.length ? JSON.parse(stdout).formats : {};
+        let formats;
+        try {
+          formats = stdout.length ? JSON.parse(stdout).formats : {};
+        } catch (err) {
+          console.log(song);
+          console.log(err);
+          process.exit();
+        }
         const o = _(formats)
           .filter(f => f.format_note.includes('udio'))
           .sortBy('filesize')
@@ -44,8 +51,9 @@ function parseresponse(res) {
   let $ = cheerio.load(res.text);
   return $("#results .yt-lockup-video").map((index, item)=> {
     const $item = $(item);
-    const videotime = $item.find('.video-time').text().split(':');
-    const duration = videotime[0] * 60 + parseInt(videotime[1]);
+    const videotime = $item.find('.video-time').text().split(':').reverse();
+    // будет работать для часовых видео, но не больше
+    const duration = videotime.reduce((p, n, i) => 1 * p + n * Math.pow(60, i));
     const id = $item.data('context-item-id');
     const title = $item.find('.yt-uix-tile-link').text();
     const url = `https://www.youtube.com/watch?v=${id}`;
