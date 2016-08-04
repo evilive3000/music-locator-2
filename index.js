@@ -44,7 +44,17 @@ function processSong(provider, id, pid, callback) {
       }
     }
     // каким то образом может быть так что val == undefined
-    const mse = siblings.map(s => s.mse.val.toFixed(2));
+    let mse;
+    try {
+      mse = siblings.map(s => s.mse.val.toFixed(2));
+    } catch (e){
+      console.log(song);
+      console.log('--------------------');
+      console.log(siblings);
+      console.log('--------------------');
+      console.log(e);
+      process.exit();
+    }
     mse.length === 0
       ? writeln(`"${title}" ${cstr.bold("[no siblings]")}`)
       : writeln(`"${title}" has siblings: ${cstr.bold(`[${mse.join(", ")}]`)}`);
