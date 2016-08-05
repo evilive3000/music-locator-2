@@ -56,7 +56,7 @@ const MSE = function (dataA, dataB, offset, overlap, maxMSE, result) {
   maxMSE = (maxMSE || 9.0) * minTested;
 
   if ((max(0, overlap) || 20) > testLen)
-    return null;
+    return false;
 
   let dist, vector = [], sum = 0;
   let sVec = [], sSum = 0, sLen = 0, sLast = 0, sN = 15;
